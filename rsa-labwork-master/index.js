@@ -1,17 +1,4 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyDDNsBN9kXNqMAs-dMHBgKrkY_P9xSh-po",
-    authDomain: "hideyourtext.firebaseapp.com",
-    databaseURL: "https://hideyourtext.firebaseio.com",
-    projectId: "hideyourtext",
-    storageBucket: "hideyourtext.appspot.com",
-    messagingSenderId: "805739032866",
-    appId: "1:805739032866:web:77de39a2d0d367daf4f57b",
-    measurementId: "G-EQE4XDWZ07"
-  };
-  const functions = require('firebase-functions');
-  const firebase = require("firebase");
-  firebase.initializeApp(firebaseConfig);
-  const bigInt = require('big-integer');
+const bigInt = require('big-integer');
 
 class RSA {
   static randomPrime(bits) {
@@ -84,15 +71,4 @@ class RSA {
   }
 }
 
-
-exports.myRSA_Encrypt= functions.https.onCall((data,context)=>{
-    const keys = RSA.generate(250);
-    const encoded_message = RSA.encode(data.text);
-    const encrypted_message = RSA.encrypt(encoded_message, keys.n, keys.e);
-    return encrypted_message.toString();
-});
-/*
-exports.myRSA_Decrypt= functions.https.onCall((data,context)=>{
-  
-});
-*/
+module.exports = RSA;

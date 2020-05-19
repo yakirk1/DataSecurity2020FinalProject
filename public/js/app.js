@@ -39,7 +39,7 @@ hideTextForm.addEventListener('submit', (e)=>{
 const myRSA_Encrypt = firebase.functions().httpsCallable('myRSA_Encrypt');
 var text=document.getElementById('chosen_text').value;
 myRSA_Encrypt({text:text}).then(data =>{
-  console.log(data.toString());
+  console.log(data);
 })
 
 
