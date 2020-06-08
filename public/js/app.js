@@ -76,25 +76,19 @@ revealTextForm.addEventListener('submit',(e)=>{
 
   context.drawImage(hiddenimg, 0,0,canvas.width,canvas.height);
   var imageDataHidden = context.getImageData(0, 0, canvas.width, canvas.height);
-  console.log(imageDataHidden);
   
   context.drawImage(originalimg,0,0,canvas.width,canvas.height);
   var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
-  console.log(imageDataOriginal);
 
   var HiddenMsg=[];
   var decodedMsg;
-  console.log(imageDataHidden.data[0]);
   var length = imageDataHidden.data[0];
-  console.log(length);
   for(var i=0;i<length;i++){
     //consol e.log(HiddenMsg)
     HiddenMsg[i]=Math.abs(imageDataOriginal.data[i+1]-imageDataHidden.data[i+1]);
   }
 
-  console.log(HiddenMsg);
   //myRSA_Decrypt({RSA:HiddenMsg}).then(data =>{
-    //console.log(data);
   //})
   /*
       myRSA_Decrypt({msg:HiddenMsg}).then(data=>{
@@ -105,8 +99,6 @@ revealTextForm.addEventListener('submit',(e)=>{
       const ref = firebase.firestore().collection('images');
       ref.onSnapshot(snapshot => {
         snapshot.forEach(doc => {
-            console.log(HiddenMsg);
-            console.log(doc.data().rsa);
             if(closeEnough(doc.data().rsa,HiddenMsg)){
               myImage.push({...doc.data(), id: doc.id});
             }
@@ -153,8 +145,6 @@ const myRSA_Encrypt = firebase.functions().httpsCallable('myRSA_Encrypt');
 const addImage = firebase.functions().httpsCallable('addImage');
 var text=document.getElementById('chosen_text').value;
 var img=document.getElementById('myHidingImage');
-console.log(text);
-console.log(img.value);
 //if(text==""||text.length>20){
   //alert("Please set your message to be 1~20 characters");
   //hideTextForm.reset();
@@ -166,8 +156,6 @@ else{
 myRSA_Encrypt({text:text}).then(data =>{
   
   //console.log(data.data.data);
-  console.log(data.data);
-  console.log(data.data.decodedData)
   var arr=[];
   for(var i=0;i<data.data.data.length;i++){
     arr[i]=dict[data.data.data[i]];
@@ -217,7 +205,6 @@ function onFileSelectedReveal(event) {
   var reader = new FileReader();
 
   var imgtag = document.getElementById("SourceImageReveal");
-  console.log(imgtag);
   imgtag.title = selectedFile.name;
   reader.onload = function(event) {
     imgtag.src = event.target.result;
@@ -230,7 +217,6 @@ function onFileSelectedRevealOriginal(event) {
   var reader = new FileReader();
 
   var imgtag = document.getElementById("SourceOriginal");
-  console.log(imgtag);
   imgtag.title = selectedFile.name;
 
   reader.onload = function(event) {
@@ -244,7 +230,6 @@ var canvas;
 var context;
 
 function init(data) {
-  console.log("in init");
   var image = document.getElementById('SourceImage');
   effectButton = document.getElementById('EffectButton');
   paintButton = document.getElementById('PaintButton');
@@ -278,10 +263,7 @@ function addEffect(data) {
 }
 
 function HideEncryptedMessage(data,textData) {
-  console.log(data);
-  console.log(textData);
   data[0]=textData.length;
-  console.log(textData.length/data.length);
   if(textData.length/data.length<0.1){
   for (var i = 1; i < textData.length+1; i=i+1 ) {
     if(data[i]-dict[textData[i-1]]<0)
@@ -291,7 +273,6 @@ function HideEncryptedMessage(data,textData) {
     }
   }
 
-  console.log(data);
   return true
 }
 else{
@@ -309,7 +290,6 @@ function closeEnough(dataRSA,RSA){
     }
   if(count<10)
   {
-    console.log(dataRSA)
     return true;
   }
   return false;
