@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+
+    crossorigin="anonymous"> 
+    </script>
+    <script src="js/add-download-btn.js"></script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HideYourText</title>
@@ -47,23 +54,65 @@
         <h2>Hiding text</h2>
        <form>
         <input type="text" id ="chosen_text" name="chosen_text" placeholder="text...">
-        <input type="file" id="myHidingImage" name="myHidingImage" accept="image/x-png,image/jpeg" />
+        <input type="file" id="myHidingImage" name="myHidingImage" accept="image/x-png" onchange="onFileSelectedHide(event)"/>
         <p class="error"></p>
         <button type="submit"> Submit </button>
        </form>
      </div>
     </div>
-
+  
     <div class="revealText-modal">
       <div class="modal">
         <h2>Revealing text</h2>
        <form>
-        <input type="file" name="myRevealingImage" accept="image/x-png,image/jpeg" />
+        <label>Hidden</label>
+        <input type="file" id="originalRevealingImage" accept="image/x-png" onchange="onFileSelectedReveal(event)">
+        <label>Original</label>
+        <input type="file" id="myRevealingImage" accept="image/x-png" onchange="onFileSelectedRevealOriginal(event)">
+
         <p class="error"></p>
+        <button type="submit"> Submit </button>
        </form>
-     </div>
+      </div>
     </div>
 
+    <div class="container">
+      <div class="column">
+        <img id="SourceImage" src="" crossorigin="Anonymous">
+      </div>
+      <div class="column">
+        <div class="canvas">
+          <canvas id="Canvas"></canvas>
+        </div>
+      </div>
+      <button id="myBtn" style="display:none" onclick="download_image()">
+        Download
+        </button>
+    </div>
+    <div class="container">
+      <div class="column">
+        <img id="SourceImageReveal" style="display:none" src="" crossorigin="Anonymous"> 
+      </div>
+    </div>
+    
+    <div class="container">
+      <div class="column">
+        <img id="SourceOriginal"  style="display:none" src="" crossorigin="Anonymous"> 
+      </div>
+    </div>
+    <p id="revealed" style="border:solid ;display:none; width:1000px" ></p>
+    <div style="position: fixed;
+    left: 10px; top:500px">
+    <p style="border:solid;" id="instructions">
+      Welcome to HideYourText!<br>
+      1.You can either hide text or reveal hidden messages.<br>
+      2.Please choose only PNG files to succesfuly hide messages.<br>
+      3.You can download the hidden picture we provide you using the download button.<br>
+      4.In order to reveal hidden text, you must provide both the original picture and the hidden one.
+    
+    
+    </p>
+    </div>
     <!-- firebase base model -->
     <script src="/__/firebase/7.14.4/firebase-app.js"></script>   
    
@@ -71,13 +120,16 @@
     <!-- firebase features -->
     
     <script src="/__/firebase/7.14.4/firebase-functions.js"></script>
+    <script src="/__/firebase/7.14.4/firebase-firestore.js"></script>
+
     <!-- initialize SDK  -->
 
     <!-- Initialize Firebase -->
     <script src="/__/firebase/init.js"></script>
 
     <script src="js/app.js"></script>
-
+    
+    
 
 
 

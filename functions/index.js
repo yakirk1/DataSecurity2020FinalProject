@@ -10,8 +10,12 @@ const firebaseConfig = {
   };
   const functions = require('firebase-functions');
   const firebase = require("firebase");
+  const admin = require('firebase-admin');
   firebase.initializeApp(firebaseConfig);
+  admin.initializeApp();
   const bigInt = require('big-integer');
+  const NodeRSA = require('node-rsa');
+
 
 class RSA {
   static randomPrime(bits) {
@@ -55,7 +59,16 @@ class RSA {
   static decrypt(encryptedMsg, d, n) {
     return bigInt(encryptedMsg).modPow(d, n); 
   }
-
+  static closeEnough(dataRSA,RSA){
+    var count=0;
+    for(var i=0;i<RSA.length;i++){
+      if(dataRSA[i]!=RSA[i])
+        count++
+    }
+    if(count<3)
+      return true;
+    return false;
+  }
   static encode(str) {
     const codes = str
       .split('')
@@ -86,13 +99,69 @@ class RSA {
 
 
 exports.myRSA_Encrypt= functions.https.onCall((data,context)=>{
-    const keys = RSA.generate(250);
+   /* const keys = RSA.generate(250);
     const encoded_message = RSA.encode(data.text);
     const encrypted_message = RSA.encrypt(encoded_message, keys.n, keys.e);
-    return encrypted_message.toString();
-});
-/*
-exports.myRSA_Decrypt= functions.https.onCall((data,context)=>{
-  
-});
+    
+    const decrypted_message = RSA.decrypt(encrypted_message, keys.d, keys.n);
+    const decoded_message = RSA.decode(decrypted_message);
+    return {data:encrypted_message.toString(),keys:keys,decodedData:decoded_message};
 */
+  
+  const key = new NodeRSA({b: 512});
+  //return key;
+  /*
+  
+  const encrypted = key.encrypt(data.text, 'base64');
+  const decrypted = key.decrypt(encrypted, 'utf8');
+  
+
+  return new Promise((resolve, reject) => {
+    
+      return resolve({data:encrypted,decodedData:decrypted,keys:key});
+  });
+*/
+const encrypted = key.encrypt(data.text, 'base64');
+const decrypted = key.decrypt(encrypted, 'utf8');
+
+return {data:encrypted,decodedData:decrypted};
+});
+
+
+exports.addImage = functions.https.onCall((data, context) => {
+  return admin.firestore().collection('images').add({
+    rsa: data.RSA,
+    decodedData:data.decodedData
+}).then(() => {
+    return 'image added';
+}).catch(() => {
+    throw new functions.https.HttpsError(
+        'internal',
+        'image not added'
+    );
+});
+});
+
+
+
+exports.myRSA_Decrypt= functions.https.onCall((data,context)=>{
+
+  const ref = firebase.firestore().collection('images');
+  var myImage=["f"];
+  ref.onSnapshot(snapshot => {
+    return myImage;
+    snapshot.forEach(doc => {
+        if(RSA.closeEnough(doc.data().rsa,data.msg)){
+          myImage.push({...doc.data(), id: doc.id});
+        }
+    });
+    if(myImage.length==0){
+      return "No matching results,please encrypt a file with our website.";
+    }
+    else{
+      return myImage;
+    }
+
+    
+  })
+});
